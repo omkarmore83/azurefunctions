@@ -27,18 +27,11 @@
             ]
         },
         {
-            "path-prefix": "/admin",
+            "path-prefix": "/{*rest}",
             "http-methods": [
                 "ANY"
             ],
-            "target-uri": "https://%%WEBSITE_HOSTNAME%%/admin"
-        },
-        {
-            "path-prefix": "/admin/{*rest}",
-            "http-methods": [
-                "ANY"
-            ],
-            "target-uri": "https://%%WEBSITE_HOSTNAME%%/admin/{rest}"
+            "target-uri": "https://%%WEBSITE_HOSTNAME%%/{*rest}"
         }
     ]
 }
