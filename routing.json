@@ -31,7 +31,7 @@
             "http-methods": [
                 "ANY"
             ],
-            "target-uri": "https://%%WEBSITE_HOSTNAME%%/{*rest}"
+            "target-uri": "https://%%WEBSITE_HOSTNAME%%/{rest}"
         }
     ]
 }
