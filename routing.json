@@ -23,22 +23,22 @@
                     "set-headers": {
                         "newheader1": "seattle"
                     }
-                },
-                {
-                    "path-prefix": "/admin",
-                    "http-methods": [
-                        "ANY"
-                    ],
-                    "target-uri": "https://%%WEBSITE_HOSTNAME%%/admin"
-                },
-                {
-                    "path-prefix": "/admin/{*rest}",
-                    "http-methods": [
-                        "ANY"
-                    ],
-                    "target-uri": "https://%%WEBSITE_HOSTNAME%%/admin/{rest}"
                 }
             ]
+        },
+        {
+            "path-prefix": "/admin",
+            "http-methods": [
+                "ANY"
+            ],
+            "target-uri": "https://%%WEBSITE_HOSTNAME%%/admin"
+        },
+        {
+            "path-prefix": "/admin/{*rest}",
+            "http-methods": [
+                "ANY"
+            ],
+            "target-uri": "https://%%WEBSITE_HOSTNAME%%/admin/{rest}"
         }
     ]
 }
