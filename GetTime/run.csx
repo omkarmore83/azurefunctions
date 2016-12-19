@@ -4,6 +4,5 @@ using System.Threading.Tasks;
 
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
 {
-    return req.CreateResponse(HttpStatusCode.OK, "Hello World" + DateTime.Now);
-    
+    return req.CreateResponse(HttpStatusCode.OK, $"Current Time : {DateTime.Now}");    
 }
