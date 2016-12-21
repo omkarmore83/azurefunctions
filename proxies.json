@@ -1,0 +1,33 @@
+{
+  "proxies": {
+    "proxy1 - Simple Get Case 1": {
+      "matchCondition": {
+        "methods": [
+          "GET"
+        ],
+        "route": "/ip"
+      },
+      "backendUri": "https://httpbin.org/ip"
+    },
+    "proxy4 - Example for response status overrides": {
+      "matchCondition": {
+        "methods": [
+          "GET"
+        ],
+        "route": "status/{code}/{desc}"
+      },
+      "responseOverrides": {
+        "response.status": "{code} {desc}"
+      }
+    },
+    "default": {
+      "matchCondition": {
+        "methods": [
+          "ANY"
+        ],
+        "route": "/{*rest}"
+      },
+      "backendUri": "https://%WEBSITE_HOSTNAME%/{rest}"
+    }
+  }
+}
