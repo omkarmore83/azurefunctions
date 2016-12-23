@@ -1,33 +1,231 @@
 {
-  "proxies": {
-    "proxy1 - Simple Get Case 1": {
-      "matchCondition": {
-        "methods": [
-          "GET"
-        ],
-        "route": "/ip"
-      },
-      "backendUri": "https://httpbin.org/ip"
-    },
-    "proxy4 - Example for response status overrides": {
-      "matchCondition": {
-        "methods": [
-          "GET"
-        ],
-        "route": "status/{code}/{desc}"
-      },
-      "responseOverrides": {
-        "response.status": "{code} {desc}"
-      }
-    },
-    "default": {
-      "matchCondition": {
-        "methods": [
-          "ANY"
-        ],
-        "route": "/{*rest}"
-      },
-      "backendUri": "https://%WEBSITE_HOSTNAME%/{rest}"
+    "proxies": {
+        "ListAll": {
+            "desc": [
+                "This is the index of examples."
+            ],
+            "matchCondition": {
+                "methods": [
+                    "GET"
+                ],
+                "route": "/list"
+            },
+            "responseOverrides": {
+                "response.status": "200 OK",
+                "response.header.Content-Type": "application/json",
+                "response.body": {
+                    "px1": {
+                        "title": "px1 - Simplest rewrite",
+                        "url": "https://%WEBSITE_HOSTNAME%/ip"
+                    },
+                    "px2": {
+                        "title": "px2 - Transform header, segment and querystring",
+                        "url": "https://%WEBSITE_HOSTNAME%/test2/123"
+                    },
+                    "px3": {
+                        "title": "px3 - Conditional output based on Response status",
+                        "url": "https://%WEBSITE_HOSTNAME%/test3/200"
+                    },
+                    "px4a": {
+                        "title": "px4a - Example for other Verbs",
+                        "url": "https://%WEBSITE_HOSTNAME%/verbs/posts/1"
+                    },
+                    "px4b": {
+                        "title": "px4b - Example for other Verbs",
+                        "url": "https://%WEBSITE_HOSTNAME%/verbs/posts"
+                    },
+                    "px5": {
+                        "title": "px5 - Mock API for Status",
+                        "url": "https://%WEBSITE_HOSTNAME%/status/200/FINE"
+                    },
+                    "px6": {
+                        "title": "px6 - Example of Json output",
+                        "url": "https://%WEBSITE_HOSTNAME%/json/123"
+                    },
+                    "px7": {
+                        "title": "px7 - Example of XML output",
+                        "url": "https://%WEBSITE_HOSTNAME%/xml/123"
+                    },
+                    "px8": {
+                        "title": "px8 - Change Http Methods - IN ROUTING 0.0.4 (Not in Prod)",
+                        "url": "https://%WEBSITE_HOSTNAME%/method/GET"
+                    },
+                    "px9": {
+                        "title": "px9 - Client Certificate Based Auth - IN ROUTING 0.0.4 (Not in Prod)",
+                        "url": "https://%WEBSITE_HOSTNAME%/cert"
+                    },
+                    "px10": {
+                        "title": "px10 - Trace Logging and Debugging - IN ROUTING 0.0.4 (Not in Prod)",
+                        "url": "https://%WEBSITE_HOSTNAME%/debug"
+                    }
+                }
+            }
+        },
+        "px1 - Simplest rewrite": {
+            "matchCondition": {
+                "methods": [
+                    "GET"
+                ],
+                "route": "/ip"
+            },
+            "backendUri": "https://httpbin.org/ip"
+        },
+        "px2 - Transform header, segment and querystring": {
+            "desc": [
+                "Example show how you can",
+                "1. Read headers (request.header.<<header name>>), segements({xyz}) and querystring (request.querystring.<<param name>>) from input request ",
+                "2. Set the backend headers (backend.request.header.<<header name>>, querystring (backend.request.querystring.<<param name>>)",
+                "3. Set the response headers (repsonse.header.<<header name>>), status (response.status)",
+                "4. You can use AppSettings in your proxy definitons by enclosing theam with %% For e.g.%APP_SETTING_NAME%",
+                "Sample input: https://<<yourhostname>>/test2/1?operation=posts&version=1.2"
+            ],
+            "matchCondition": {
+                "methods": [
+                    "GET"
+                ],
+                "route": "/test2/{uid}"
+            },
+            "backendUri": "https://jsonplaceholder.typicode.com/users/{uid}/{request.querystring.operation}",
+            "requestOverrides": {
+                "backend.request.querystring.newkey": "request.header.me",
+                "backend.request.querystring.userId": "{uid}",
+                "backend.request.querystring.token": "%MY_CUSTOM_TOKEN%",
+                "backend.request.header.appname": "Appname is %CUSTOM_SETTING%",
+                "backend.request.header.myheaderv": "request.querystring.version"
+            },
+            "responseOverrides": {
+                "response.header.myversion": "backend.response.header.version",
+                "response.header.anotherHeader": "Some other value is %CUSTOM_SETTING%",
+                "response.status": "200 FINE"
+            }
+        },
+        "px3 - Conditional output based on Response status": {
+            "desc": [
+                "Example to handle backend response code and transform response accordingly",
+                "Note that you can also set the response body to either json or xml (shown in px6 and px7)"
+            ],
+            "matchCondition": {
+                "methods": [
+                    "GET"
+                ],
+                "route": "/test3/{code}"
+            },
+            "backendUri": "https://httpbin.org/status/{code}",
+            "responseOverrides": {
+                "backend.response.statusCode": {
+                    "302": {
+                        "response.header.Location": "http://myerrorpage"
+                    },
+                    "501": {
+                        "response.header.myversion": "backend.response.header.version",
+                        "response.status": "404 Not found"
+                    },
+                    "2XX": {
+                        "response.header.mystatus": "Success"
+                    },
+                    "4xx": {
+                        "response.status": "{backend.response.statusCode} My Custom Message",
+                        "response.body": "The backend gave a status code = {backend.response.statusCode}."
+                    }
+                }
+            }
+        },
+        "px4a - Example for other Verbs": {
+            "desc": [
+                "The following verbs are supported GET, POST, HEAD, PUT, DELETE, OPTIONS, PATCH, CONNECT, TRACE",
+                "You can also use ANY to represent all the abover verbs"
+            ],
+            "matchCondition": {
+                "methods": [
+                    "PUT",
+                    "PATCH",
+                    "DELETE",
+                    "GET"
+                ],
+                "route": "/verbs/posts/{id}"
+            },
+            "backendUri": "https://jsonplaceholder.typicode.com/posts/{id}"
+        },
+        "px4b - Example for other Verbs": {
+            "desc": [
+                "The following verbs are supported GET, POST, HEAD, PUT, DELETE, OPTIONS, PATCH, CONNECT, TRACE",
+                "You can also use ANY to represent all the abover verbs"
+            ],
+            "matchCondition": {
+                "methods": [
+                    "POST"
+                ],
+                "route": "/verbs/posts"
+            },
+            "backendUri": "https://jsonplaceholder.typicode.com/posts"
+        },
+        "px5 - Mock API for Status": {
+            "desc": [
+                "You can skip providing the backendUri to create mock apis.",
+                "Here is a sample api which returns the requests http status"
+            ],
+            "matchCondition": {
+                "methods": [
+                    "GET"
+                ],
+                "route": "status/{code}/{desc}"
+            },
+            "responseOverrides": {
+                "response.status": "{code} {desc}"
+            }
+        },
+        "px6 - Example of Json output ": {
+            "desc": [
+                "You can set the response body to a json object.",
+                "You can use this in conjunction with conditional overrrides to provie response based on status codes",
+                "The is can be useful for creating mock apis for development and testing"
+            ],
+            "matchCondition": {
+                "methods": [
+                    "GET"
+                ],
+                "route": "json/{id}"
+            },
+            "responseOverrides": {
+                "response.status": "200 OK",
+                "response.header.Content-Type": "application/json",
+                "response.body": {
+                    "User": {
+                        "Id": "{id}",
+                        "Name": "User Name {id}"
+                    }
+                }
+            }
+        },
+        "px7 - Example of XML output": {
+            "desc": [
+                "You can set the response body to a xml string.",
+                "You can use this in conjunction with conditional overrrides to provie response based on status codes",
+                "The is can be useful for creating mock apis for development and testing"
+            ],
+            "matchCondition": {
+                "methods": [
+                    "GET"
+                ],
+                "route": "xml/{id}"
+            },
+            "responseOverrides": {
+                "response.status": "200 OK",
+                "response.header.Content-Type": "application/xml",
+                "response.body": "<xml><User><Id>{id}</Id><Name>User Name {id}</Name></User></xml>"
+            }
+        },
+        "default": {
+            "desc": [
+                "Default Route to ensure existing Function apps and portal works. Do not remove"
+            ],
+            "matchCondition": {
+                "methods": [
+                    "ANY"
+                ],
+                "route": "/{*rest}"
+            },
+            "backendUri": "https://%WEBSITE_HOSTNAME%/{rest}"
+        }
     }
-  }
 }
